@@ -26,12 +26,25 @@ function splitVideo(inputPath, introPath, outroPath, outputDir, segmentDuration)
         `ffmpeg -i "${outputDir}/${videoName}.mp4" -c copy -f segment -segment_time ${segmentDuration} -reset_timestamps 1 -map 0 "${outputDir}/${videoName}%03d.mp4"`;
 
     // 执行FFmpeg命令
-    exec(mergeCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`视频分割失败: ${error.message}`);
-            return;
+    const ffmpegProcess = exec(mergeCommand);
+
+    ffmpegProcess.stderr.on('data', (data) => {
+        const output = data.toString();
+        // 提取进度信息
+        const regex = /time=(\d+:\d+:\d+)/;
+        const matches = output.match(regex);
+        if (matches && matches[1]) {
+            const currentTime = matches[1];
+            console.log(`当前处理进度：${currentTime}`);
         }
-        console.log('视频分割完成！');
+    });
+
+    ffmpegProcess.on('close', (code) => {
+        if (code === 0) {
+            console.log('视频分割完成！');
+        } else {
+            console.error(`视频分割失败，退出码：${code}`);
+        }
     });
 }
 

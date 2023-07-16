@@ -1,7 +1,7 @@
 const { exec } = require('child_process');
 
 // 视频文件路径
-const videoPath = './秘密.mp4';
+const videoPath = './原视频/秘密.mp4';
 // 输出目录
 const outputDir = './截取';
 
