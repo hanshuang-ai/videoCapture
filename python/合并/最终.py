@@ -54,7 +54,7 @@ for i, video_path in enumerate(video_paths):
         print("Error extracting audio or generating blank audio:", str(e))
 
 # 音频文件列表
-audio_output_file = "video2.mp3"
+audio_output_file = os.path.splitext(video_paths[1])[0] + ".mp3"
 
 # 调用合并音频函数
 merge_audios(audio_files, audio_output_file)
@@ -96,13 +96,10 @@ video_files = ["video1.mp4", "video2.mp4", "video3.mp4"]
 # 合并后的输出文件
 output_file = "merged_video_audio.mp4"
 
-# 音频文件路径
-audio_file = "video2.mp3"
-
 # 调用合并视频和音频函数
-merge_videos_and_audio(video_files, audio_file, output_file)
+merge_videos_and_audio(video_files, audio_output_file, output_file)
 
 # 删除中间生成的音频文件
-os.remove(audio_file)
+# os.remove(audio_output_file)
 
-print("中间音频文件已删除。")
+# print("中间音频文件已删除。")
