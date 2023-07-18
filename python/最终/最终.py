@@ -102,7 +102,15 @@ merged_video.write_videofile(output_path, codec="libx264", audio_codec="aac")
 print(f"已合并视频文件保存为 {output_path}")
 
 # 将音频文件移动到音频文件夹
+# audio_folder = os.path.join(video2_folder, "音频")
+# os.makedirs(audio_folder, exist_ok=True)
+# shutil.move(audio_output_path, os.path.join(audio_folder, os.path.basename(audio_output_path)))
+# print("中间音频文件已移动。")
+
+# 将音频文件移动到音频文件夹并重命名为video2的名字
 audio_folder = os.path.join(video2_folder, "音频")
 os.makedirs(audio_folder, exist_ok=True)
-shutil.move(audio_output_path, os.path.join(audio_folder, os.path.basename(audio_output_path)))
-print("中间音频文件已移动。")
+audio_output_filename = os.path.splitext(video2_files[0])[0] + ".mp3"
+audio_output_newpath = os.path.join(audio_folder, audio_output_filename)
+shutil.move(audio_output_path, audio_output_newpath)
+print(f"中间音频文件已移动到 {audio_output_newpath}")
