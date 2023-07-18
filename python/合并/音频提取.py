@@ -1,36 +1,30 @@
-from moviepy.editor import VideoFileClip, AudioFileClip
-import os
+import subprocess
 
-def extract_audio(video_path):
-    # 检查视频文件是否存在
-    if not os.path.exists(video_path):
-        print(f"视频文件 {video_path} 不存在")
-        return
+def extract_audio(video_path, audio_path, fade_duration):
+    cmd = ['ffmpeg', '-i', video_path, '-vn', '-c:a', 'libmp3lame', '-q:a', '2', '-af', f'afade=t=in:ss=0:d={fade_duration},afade=t=out:st={duration-fade_duration}:d={fade_duration}', audio_path]
+    subprocess.call(cmd)
 
-    video = VideoFileClip(video_path)
+def get_video_duration(video_path):
+    cmd = ['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', video_path]
+    output = subprocess.check_output(cmd).decode('utf-8').strip()
+    duration = float(output)
+    return duration
 
-    # 检查视频是否有音频
-    if video.audio is None:
-        # 创建与视频等长的空白音频
-        audio = AudioFileClip(duration=video.duration)
-        # 保存空白音频
-        audio_path = os.path.splitext(video_path)[0] + ".mp3"
-        audio.write_audiofile(audio_path)
-        print(f"已生成空白音频文件 {audio_path}")
-    else:
-        # 提取视频的音频
-        audio = video.audio
-        # 保存音频文件
-        audio_path = os.path.splitext(video_path)[0] + ".mp3"
-        audio.write_audiofile(audio_path)
-        print(f"已提取音频文件 {audio_path}")
+# 提取多个视频的音频并应用淡入淡出效果或生成空白音频
+video_paths = ['video1.mp4', 'video2.mp4', 'video3.mp4']
+fade_duration = 3  # 淡入淡出时长（秒）
 
-    # 关闭视频和音频对象
-    video.close()
-    audio.close()
-
-# 视频文件列表
-video_files = ["video1.mp4", "video2.mp4", "video3.mp4"]
-
-for video_file in video_files:
-    extract_audio(video_file)
+for i, video_path in enumerate(video_paths):
+    audio_path = f'audio{i+1}.mp3'
+    print("Processing video:", video_path)
+    try:
+        duration = get_video_duration(video_path)
+        if duration > 0:
+            extract_audio(video_path, audio_path, fade_duration)
+            print("Audio extracted with fade effect successfully.")
+        else:
+            cmd = ['ffmpeg', '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-t', str(duration), audio_path]
+            subprocess.call(cmd)
+            print("Blank audio generated successfully.")
+    except Exception as e:
+        print("Error extracting audio or generating blank audio:", str(e))
