@@ -2,6 +2,7 @@ import subprocess
 from pydub import AudioSegment
 import os
 from moviepy.editor import VideoFileClip, concatenate_videoclips, AudioFileClip
+import shutil
 
 def extract_audio(video_path, audio_path, fade_duration):
     cmd = ['ffmpeg', '-i', video_path, '-vn', '-c:a', 'libmp3lame', '-q:a', '2', '-af', f'afade=t=in:ss=0:d={fade_duration},afade=t=out:st={duration-fade_duration}:d={fade_duration}', audio_path]
@@ -54,10 +55,12 @@ for i, video_path in enumerate(video_paths):
         print("Error extracting audio or generating blank audio:", str(e))
 
 # 音频文件列表
-audio_output_file = os.path.splitext(video_paths[1])[0] + ".mp3"
+audio_output_file = os.path.join(os.path.dirname(video_paths[1]), os.path.splitext(video_paths[1])[0] + ".mp3")
 
 # 调用合并音频函数
 merge_audios(audio_files, audio_output_file)
+
+
 
 # 合并视频和音频
 def merge_videos_and_audio(video_files, audio_file, output_file):
@@ -82,24 +85,33 @@ def merge_videos_and_audio(video_files, audio_file, output_file):
 
     # 生成最终文件名
     video2_filename = os.path.splitext(video_files[1])[0]
-    output_filename = f"{video2_filename}_{os.path.basename(output_file)}"
+    output_filename = f"{video2_filename}.mp4"
+
+    # 最终视频文件保存路径
+    output_folder = os.path.join(os.path.dirname(video_files[1]), "视频")
+    os.makedirs(output_folder, exist_ok=True)
+    output_path = os.path.join(output_folder, output_filename)
 
     # 保存合并后的视频文件
-    merged_video.write_videofile(output_filename, codec="libx264", audio_codec="aac")
-    print(f"已合并视频文件保存为 {output_filename}")
-
-    print("中间视频文件已删除。")
+    merged_video.write_videofile(output_path, codec="libx264", audio_codec="aac")
+    print(f"已合并视频文件保存为 {output_path}")
 
 # 视频文件列表
 video_files = ["video1.mp4", "video2.mp4", "video3.mp4"]
 
-# 合并后的输出文件
-output_file = "merged_video_audio.mp4"
+# 合并后的输出文件夹
+output_folder = os.path.join(os.path.dirname(video_files[1]), "视频")
+os.makedirs(output_folder, exist_ok=True)
 
 # 调用合并视频和音频函数
-merge_videos_and_audio(video_files, audio_output_file, output_file)
+merge_videos_and_audio(video_files, audio_output_file, output_folder)
 
-# 删除中间生成的音频文件
-# os.remove(audio_output_file)
+print("中间音频文件已删除。")
 
-# print("中间音频文件已删除。")
+
+# 移动音频文件到音频文件夹
+audio_folder = os.path.join(os.path.dirname(video_paths[1]), "音频")
+os.makedirs(audio_folder, exist_ok=True)
+shutil.move(audio_output_file, os.path.join(audio_folder, os.path.basename(audio_output_file)))
+
+print("中间音频文件已移动。")
