@@ -101,7 +101,6 @@ merged_video = merged_video.set_audio(audio)
 merged_video.write_videofile(output_path, codec="libx264", audio_codec="aac")
 print(f"已合并视频文件保存为 {output_path}")
 
-
 # 将音频文件移动到音频文件夹并重命名为video2的名字
 audio_folder = os.path.join(video2_folder, "音频")
 os.makedirs(audio_folder, exist_ok=True)
@@ -109,3 +108,32 @@ audio_output_filename = os.path.splitext(video2_files[0])[0] + ".mp3"
 audio_output_newpath = os.path.join(audio_folder, audio_output_filename)
 shutil.move(audio_output_path, audio_output_newpath)
 print(f"中间音频文件已移动到 {audio_output_newpath}")
+
+# 获取当前脚本所在的目录
+current_directory = os.path.dirname(os.path.abspath(__file__))
+
+# 在"剪切后"文件夹中创建名为"a"的子文件夹的路径
+folder_path = os.path.join(current_directory, video2_folder, os.path.splitext(video2_files[0])[0])
+
+# 检查目录是否存在，如果不存在则创建
+if not os.path.exists(folder_path):
+    os.makedirs(folder_path)
+    print(f"成功创建{folder_path}文件夹")
+else:
+    print(f"{folder_path}文件夹已经存在")
+
+# 获取"剪切后"目录路径
+video_folder_path = os.path.join(current_directory, "剪切后", "视频")
+audio_folder_path = os.path.join(current_directory, "剪切后", "音频")
+
+# 移动"视频"目录到新的"a"目录下
+new_video_folder_path = os.path.join(folder_path, "视频")
+os.makedirs(new_video_folder_path, exist_ok=True)
+shutil.move(video_folder_path, new_video_folder_path)
+print("成功将'视频'目录移动到'a'文件夹下")
+
+# 移动"音频"目录到新的"a"目录下
+new_audio_folder_path = os.path.join(folder_path, "音频")
+os.makedirs(new_audio_folder_path, exist_ok=True)
+shutil.move(audio_folder_path, new_audio_folder_path)
+print("成功将'音频'目录移动到'a'文件夹下")
