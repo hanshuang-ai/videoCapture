@@ -127,13 +127,13 @@ video_folder_path = os.path.join(current_directory, "剪切后", "视频")
 audio_folder_path = os.path.join(current_directory, "剪切后", "音频")
 
 # 移动"视频"目录到新的"a"目录下
-new_video_folder_path = os.path.join(folder_path, "视频")
+new_video_folder_path = os.path.join(folder_path, "")
 os.makedirs(new_video_folder_path, exist_ok=True)
 shutil.move(video_folder_path, new_video_folder_path)
 print("成功将'视频'目录移动到'a'文件夹下")
 
 # 移动"音频"目录到新的"a"目录下
-new_audio_folder_path = os.path.join(folder_path, "音频")
+new_audio_folder_path = os.path.join(folder_path, "")
 os.makedirs(new_audio_folder_path, exist_ok=True)
 shutil.move(audio_folder_path, new_audio_folder_path)
 print("成功将'音频'目录移动到'a'文件夹下")
